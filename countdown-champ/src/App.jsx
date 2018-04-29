@@ -3,10 +3,36 @@ import React, { Component } from 'react'
 import './App.css'
 
 class App extends Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            deadline: 'December 25, 2017',
+            newDeadline: ''
+        }
+
+        this.changedDeadline = this.changedDeadline.bind(this)
+        this.handleNewDeadline = this.handleNewDeadline.bind(this)
+    }
+
+    handleNewDeadline(e) {
+        e.preventDefault()
+
+        this.setState({
+            newDeadline: e.target.value
+        })
+    }
+
+    changedDeadline() {
+        this.setState({
+            deadline: this.state.newDeadline
+        })
+    }
+
     render() {
         return (
             <div className='App' >
-                <div className='App-title' >Coutndown to December 25, 2017</div>
+                <div className='App-title' >Coutndown to {this.state.deadline}</div>
                 <div>
                     <div>
                         <span className='Clock-num' >14 days</span>
@@ -15,8 +41,11 @@ class App extends Component {
                         <span className='Clock-num' >20 seconds</span>
                     </div>
                     <div>
-                        <input type="text" placeholder="New Date" />
-                        <button>Submit</button>
+                        <input
+                            type="text"
+                            placeholder="New Date"
+                            onChange={this.handleNewDeadline} />
+                        <button onClick={this.changedDeadline} >Submit</button>
                     </div>
                 </div>
             </div>
