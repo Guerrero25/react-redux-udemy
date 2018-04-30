@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import Clock from './Clock'
+
 import './App.css'
 
 class App extends Component {
@@ -7,7 +9,7 @@ class App extends Component {
         super(props)
 
         this.state = {
-            deadline: 'December 25, 2017',
+            deadline: 'December 25, 2018',
             newDeadline: ''
         }
 
@@ -34,12 +36,7 @@ class App extends Component {
             <div className='App' >
                 <div className='App-title' >Coutndown to {this.state.deadline}</div>
                 <div>
-                    <div>
-                        <span className='Clock-num' >14 days</span>
-                        <span className='Clock-num' >30 hours</span>
-                        <span className='Clock-num' >15 minutes</span>
-                        <span className='Clock-num' >20 seconds</span>
-                    </div>
+                    <Clock deadline={this.state.deadline} />
                     <div>
                         <input
                             type="text"
