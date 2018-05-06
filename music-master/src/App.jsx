@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Form, FormControl, InputGroup, Glyphicon } from 'react-bootstrap'
+import Profile from './Profile'
+import Gallery from './Gallery'
 
 import './App.css'
 
@@ -9,8 +11,11 @@ class App extends Component {
 
         this.state = {
             query: '',
+            artist: null,
+            tracks: [],
             params: this.getHashParams(),
-            access_token: ''
+            access_token: window.localStorage.getItem('auth_token'),
+            token_type: window.localStorage.getItem('token_type')
         }
 
         this.search = this.search.bind(this)
@@ -18,9 +23,11 @@ class App extends Component {
 
     componentWillMount() {
         if (this.state.params.access_token) {
-            const access_token = this.state.params.access_token
+            const { access_token, expires_in, token_type } = this.state.params
 
             window.localStorage.setItem('auth_token', access_token)
+            window.localStorage.setItem('expires_in', expires_in)
+            window.localStorage.setItem('token_type', token_type)
 
             window.location = 'http://localhost:3000'
         }
@@ -35,12 +42,6 @@ class App extends Component {
             }
             
             window.location = 'https://accounts.spotify.com/authorize?' + this.stringify(AUTH_SETTINGS)
-        }
-
-        if (!this.state.access_token) {
-            this.setState({
-                access_token: window.localStorage.getItem('auth_token')
-            })
         }
     }
 
@@ -67,14 +68,44 @@ class App extends Component {
         e.preventDefault()
         console.log('this.state', this.state)
         const BASE_URL = 'https://api.spotify.com/v1/search?',
-              OPTIONS = {
-                  q: this.state.query,
-                  type: 'artist',
-                  limit: 1
-              },
-              FETCH_URL = BASE_URL + this.stringify(OPTIONS)
+            OPTIONS = {
+                q: this.state.query,
+                type: 'artist',
+                limit: 1
+            },
+            ALBUM_URL = 'https://api.spotify.com/v1/artists',
+            Authorization = this.state.token_type + ' ' + this.state.access_token
+        let FETCH_URL = BASE_URL + this.stringify(OPTIONS)
 
         console.log('FETCH_URL', FETCH_URL)
+
+        fetch(FETCH_URL, {
+            method: 'GET',
+            headers: {
+                Authorization
+            }
+        })
+        .then(response => response.json())
+        .then(json => {
+            const artist = json.artists.items[0]
+
+            this.setState({ artist })
+
+            FETCH_URL = `${ALBUM_URL}/${artist.id}/top-tracks?country=CO`
+
+            fetch(FETCH_URL, {
+                method: 'GET',
+                headers: {
+                    Authorization
+                }
+            })
+            .then(response => response.json())
+            .then(json => {
+                const { tracks } = json
+
+                this.setState({ tracks })
+            })
+        })
     }
 
     render() {
@@ -93,13 +124,17 @@ class App extends Component {
                         </InputGroup.Addon>
                     </InputGroup>
                 </Form>
-                <div className="Profile">
-                    <div>Artist Picture</div>
-                    <div>Artist Name</div>
-                </div>
-                <div className="Gallery">
-                    Gallery
-                </div>
+                {
+                    this.state.artist
+                    ? 
+                    <div>
+                        <Profile
+                            artist={this.state.artist} />
+                        <Gallery
+                            tracks={this.state.tracks} />
+                    </div>
+                    : ''
+                }
             </div>
         )
     }
