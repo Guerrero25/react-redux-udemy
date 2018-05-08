@@ -62,7 +62,7 @@
     vertical-align: middle;
 }
 
-.track-play:hover {
+.track-play-inner:hover {
     opacity: .8;
     animation: fade-in .3s;
 }
