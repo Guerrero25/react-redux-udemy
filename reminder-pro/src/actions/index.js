@@ -2,8 +2,8 @@ import { ADD_REMINDER } from '../constants'
 
 export const addReminder = text => {
     const action = {
-        type: ADD_REMINDER,
-        text
+        text,
+        type: ADD_REMINDER
     }
 
     console.log('action in addReminder ', action)
