@@ -1,4 +1,5 @@
-import { ADD_REMINDER, DELETE_REMINDER } from '../constants'
+import { ADD_REMINDER, DELETE_REMINDER, CLEAR_REMINDERS } from '../constants'
+import { getStore, setStore } from '../lib'
 
 const reminder = action => {
     const { text, dueDate } = action
@@ -14,17 +15,25 @@ const removeById = (state = [], id) => {
     return reminders
 }
 
-const reminders = (state = [], action) => {
+const reminders = (state, action) => {
+    state = getStore('reminders') || []
     let reminders = null
 
     switch(action.type) {
         case ADD_REMINDER:
             reminders = [...state, reminder(action)]
-            console.log('reminder as state ', reminders)
+            setStore('reminders', reminders)
+
             return reminders
         case DELETE_REMINDER:
             reminders = removeById(state, action.id)
-            console.log('reminder as state ', reminders)
+            setStore('reminders', reminders)
+
+            return reminders
+        case CLEAR_REMINDERS:
+            reminders = []
+            setStore('reminders', reminders)
+
             return reminders
         default:
             return state
